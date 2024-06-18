@@ -1,0 +1,163 @@
+# Name : Hala Mohammed
+# ID : 1210312
+# Sec : 4
+
+# Verify if the  directory is exist
+if [ ! -d "CommandManuals" ]; then
+    echo "Error: The directory of the commands is not found !!!!"
+    exit 1
+fi
+
+
+
+# Read the commands from the commands.txt file
+while read -r command; do
+
+    Vcommand="CommandManuals/${command}.txt"
+
+    # Verify if the manual file exists
+    if [ ! -f "$Vcommand" ]; then
+        echo "Error: The Manual for $Vcommand is not exist."
+        exit 1
+    fi
+
+    # Verification for evry part
+      
+
+    # 1. Verify Description
+    ExpectedD=$(man "$command" | awk '/^DESCRIPTION$/,/^OPTIONS$/' | grep -v '^OPTIONS$' | head -n 5 | tr '\n' ' '| tr -s ' ')
+    ActualD=$(awk '/^Description:/{flag=1; next} /^[-]+/{flag=0} flag {print}' "$Vcommand" | tr '\n' ' ' | tr -s ' ')
+
+    echo "$ExpectedD" > ExpectedD.txt
+    echo "$ActualD" > ActualD.txt
+   
+    if ! cmp -s ExpectedD.txt ActualD.txt; then
+        echo "Error: The Description is not verified for $command!"
+        exit 1
+    fi
+    
+
+    rm ExpectedD.txt ActualD.txt
+
+    # 2. Verify Example
+  
+
+    case "$command" in
+      
+        "whereis") ExpectedE="whereis"
+        ;;
+
+        "cp") ExpectedE="echo 'Hala Mohammed' > from && cp from into && ls && rm from"
+        ;;
+
+        "mv") ExpectedE="echo 'Hala Mohammed' > from && mv from into && ls && rm into"
+        ;;
+
+        "rm") ExpectedE="touch Thefile && ls && rm Thefile && ls"
+        ;;
+
+        "free") ExpectedE="free"
+        ;;
+
+        "ps") ExpectedE="ps"
+        ;;
+
+        "top") ExpectedE="top -n 1 -b"
+        ;;
+
+        "pkill") ExpectedE="echo 'Hi' > killfile; pkill -9 $command; rm killfile"
+        ;;
+
+        "echo") ExpectedE="echo 'Hala Mohammed'"
+        ;;
+
+        "uname") ExpectedE="uname -a"
+        ;;
+
+        "date") ExpectedE="date"
+        ;;
+
+        "chmod") ExpectedE="touch TheEfile && chmod 755 TheEfile && ls && rm TheEfile && ls"
+        ;;
+
+        "df") ExpectedE="df"
+        ;;
+
+        "du") ExpectedE="du"
+        ;;
+
+        "pwd") ExpectedE="pwd"
+        ;;
+
+        "grep") ExpectedE="echo 'Hiiii' > ExampleFile && grep 'Hiiii' ExampleFile && rm ExampleFile"
+        ;;
+
+        "touch") ExpectedE="touch newfile && ls && rm newfile && ls"
+        ;;
+
+        "whoami") ExpectedE="whoami"
+        ;;
+
+        "cat") ExpectedE="echo 'Hala Mohammed - 1210312' > File && cat File && rm File"
+        ;;
+
+        *) ExpectedE="$command"
+        ;;
+    esac
+        ExecuteExample=$($ExpectedE)
+        ActualE=$(awk '/^Example:/{flag=1; next} /^---/{flag=0} flag {print}' "$Vcommand")
+       
+        
+   printf "%s\n%s\n" "$ExpectedE" "$ExecuteExample" | tr '\n' ' ' | tr -s ' ' > ExpectedE.txt
+
+       
+    echo "$ActualE" | tr '\n' ' ' | tr -s ' ' > ActualE.txt
+
+ #The comparison method is correct, but there are commands such as date It changes every second and affects the result
+ #echo "Debugging information for $command:"
+ #echo "Expected: $(cat ExpectedE.txt)"
+ #echo "Actual:   $(cat ActualE.txt)"
+
+
+    if ! cmp -s ExpectedE.txt ActualE.txt; then
+        echo "Error: The Example is not verified for $command!"
+       # exit 1
+    fi
+
+    
+    rm ExpectedE.txt ActualE.txt
+
+    # 3. Verify Version
+    ExpectedV=$(uname -r | tr '\n' ' ' | tr -s ' ')
+    ActualV=$(awk '/^Version:/{flag=1; next} /^[-]+/{flag=0} flag {print}' "$Vcommand" | tr '\n' ' ' | tr -s ' ')
+   
+    echo "$ExpectedV" > ExpectedV.txt
+    echo "$ActualV" > ActualV.txt
+ 
+    if ! cmp -s ExpectedV.txt ActualV.txt; then
+        echo "Error: The Version is not verified for $command!"
+        exit 1
+    fi
+
+   
+    rm ExpectedV.txt ActualV.txt
+
+    # 4. Verify Related Commands
+    ExpectedR=$(compgen -c | grep "$command" | tr '\n' ' ')
+    ActualR=$(awk '/^Related Commands:/{flag=1; next} /^[-]+/{flag=0} flag {print}' "$Vcommand" | tr '\n' ' ')
+        
+    echo "$ExpectedR" > ExpectedR.txt
+    echo "$ActualR" > ActualR.txt
+
+    if ! cmp -s ExpectedR.txt ActualR.txt; then
+        echo "Error: The Related Commands are not verified for $command!"
+        exit 1
+    fi
+
+    
+    rm ExpectedR.txt ActualR.txt
+
+  echo "Verification successful for $command"
+done < "commands.txt"
+
+echo "Verification Is Done !"

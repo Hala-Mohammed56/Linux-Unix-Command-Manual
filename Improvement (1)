@@ -1,0 +1,222 @@
+# Name : Hala Mohammed
+# ID : 1210312
+# Sec : 4
+
+
+chmod_recommendations=("id" "kill" "htop" "pmap" "rsync")
+uname_recommendations=("ls" "ps" "top" "df" "dmesg")
+ps_recommendations=("top" "htop" "pgrep" "killall" "pmap")
+top_recommendations=("htop" "ps" "kill" "pgrep" "pmap")
+pkill_recommendations=("kill" "killall" "ps" "top" "htop")
+cp_recommendations=("rsync" "mv" "scp" "cpio" "cat")
+mv_recommendations=("cp" "rsync" "rename" "cpio" "find")
+rm_recommendations=("rmdir" "unlink" "mv" "find" "ls")
+touch_recommendations=("echo" "printf" "cat" "date" "cp")
+whoami_recommendations=("id" "logname" "users" "groups" "w")
+cat_recommendations=("more" "less" "head" "tail" "nano")
+echo_recommendations=("printf" "echo -e" "cat" "awk" "sed")
+free_recommendations=("vmstat" "top" "htop" "cat /proc/meminfo" "pmap")
+date_recommendations=("cal" "echo $(date +%Y-%m-%d)" "uptime" "clock" "hwclock")
+df_recommendations=("du" "lsblk" "fdisk -l" "mount" "stat")
+du_recommendations=("df" "ls" "find" "tree" "stat")
+hostname_recommendations=("dnsdomainname" "domainname" "uname -n" "hostname -f" "host")
+pwd_recommendations=("cd && pwd" "dirs -v" "pwd -P" "echo $PWD" "find `pwd`")
+grep_recommendations=("ack" "egrep" "fgrep" "zgrep" "ripgrep")
+mkdir_recommendations=("ls" "cd" "rm" "cp" "mv")
+
+
+while true; do
+            
+    read -p "Do you want to search for a command or topic in the manual ,  or get command recommendations? s (search)/r (recommend)/q (exit): " answer
+
+    case "$answer" in
+
+        s | search)
+         
+            read -p "Enter the command name or topic: " answer1
+            LastSearch="$answer1"
+
+            # Check if the answer is a manual name
+            CommandFile="CommandManuals/$answer1.txt"
+            if [ -e "$CommandFile" ]; then
+                echo "Command manual for '$answer1' is  exist :"
+                cat "$CommandFile"
+            else
+                # Search for the answer in all files
+                Files=$(grep -l "$answer1" CommandManuals/*.txt)
+
+                if [ -n "$Files" ]; then
+                    echo "Found matches for '$answer1' in the following :"
+                        for file in $Files; do
+                        echo "$(basename "$file")" 
+                   #https://linuxize.com/post/basename-command-in-linux/
+                    done
+                else
+                    echo "No matches found !"
+                fi
+            fi
+            ;;
+
+       r | recommend)
+        
+
+          if [ -n "$LastSearch" ]; then
+              command="${LastSearch}_recommendations"
+              if [ -n "${!command}" ]; then
+                 echo "Recommendations for '$LastSearch':"
+                 
+
+ 
+                 case "$LastSearch" in
+                 pwd)
+                        for element in "$pwd_recommendations[@]}"; do
+                           echo "$element"
+                        done
+                        ;;
+                 uname)
+                        for element in "${uname_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    ps)
+                        for element in "${ps_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                     mkdir)
+                        for element in "${mkdir_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+
+                    top)
+                        for element in "${top_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    pkill)
+                        for element in "${pkill_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    cp)
+                        for element in "${cp_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    chmod)
+                        for element in "${chmod_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    mv)
+                        for element in "${mv_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    rm)
+                        for element in "${rm_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    touch)
+                        for element in "${touch_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    whoami)
+                        for element in "${whoami_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    cat)
+                        for element in "${cat_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    echo)
+                        for element in "${echo_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    free)
+                        for element in "${free_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    date)
+                        for element in "${date_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    df)
+                        for element in "${df_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    du)
+                        for element in "${du_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    hostname)
+                        for element in "${hostname_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    grep)
+                        for element in "${grep_recommendations[@]}"; do
+                            echo "$element"
+                        done
+                        ;;
+                    esac
+              else
+                 echo "No recommendations found for '$LastSearch'! Files in Command Manuals :"
+                 for file in CommandManuals/*.txt; do
+                   echo "$(basename "$file")"
+                 done
+              fi
+
+         else
+             echo "No last search ! Files in Command Manuals :"
+             for file in CommandManuals/*.txt; do
+               echo "$(basename "$file")"
+             done
+         fi
+
+            ;;
+
+        q | exit)
+
+       
+            echo "Exiting the program. Goodbye!"
+            exit 0
+            ;;
+
+        *)
+            echo "Invalid answer !"
+            continue
+            ;;
+    esac
+
+
+    # Ask the user if they want to search for another command in the manual
+
+    read -p "Do you want to search for another command in the  manual? (yes/no): " answer2
+
+    case "$answer2" in
+        yes)
+            continue
+            ;;
+
+        no)
+            
+            echo "Exiting the program. Goodbye!"
+            exit 0
+            ;;
+        *)
+            echo "Invalid answer. Exiting the program. Goodbye!"
+            exit 1
+            ;;
+    esac
+done

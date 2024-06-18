@@ -1,0 +1,119 @@
+# Name : Hala Mohammad
+# ID : 1210312
+# Sec : 4
+
+# Create a directory for manuals 
+mkdir -p CommandManuals
+
+# Save the Commands File "commands.txt" in a new variable 
+CommandsFile="commands.txt"
+
+# Check if the file of commands exists
+if [ ! -f "$CommandsFile" ]; then
+    echo "Error: The file is not found!"
+    exit 1
+fi
+
+
+# Read the commands from the file
+while read -r command; do
+    # Find the description of the command using "man"
+    Description=$(man "$command" | awk '/^DESCRIPTION$/,/^OPTIONS$/' | grep -v '^OPTIONS$'| head -n 5)
+    
+
+    # Find an examples of the commands using case
+      case "$command" in
+        "whreris") Example="whereis"
+        ;;
+
+        "cp") Example="echo 'Hala Mohammed' > from && cp from into && ls && rm from"
+        ;;
+
+        "mv") Example="echo 'Hala Mohammed' > from && mv from into && ls && rm into"
+        ;;
+
+        "rm") Example="touch Thefile && ls && rm Thefile && ls"
+        ;;
+
+        "free") Example="free"
+        ;;
+
+        "ps") Example="ps"
+        ;;
+
+        "top") Example="top -n 1 -b"
+        ;;
+
+        "pkill") Example="echo 'Hi' > killfile; pkill -9 $command; rm killfile"
+        ;;
+
+        "echo") Example="echo 'Hala Mohammed'"
+        ;;
+
+        "uname") Example="uname -a"
+        ;;
+
+        "date") Example="date"
+        ;;
+
+        "chmod") Example="touch TheEfile && chmod 755 TheEfile && ls && rm TheEfile && ls"
+        ;;
+
+        "df") Example="df"
+        ;;
+
+        "du") Example="du"
+        ;;
+
+        "pwd") Example="pwd"
+        ;;
+
+        "grep") Example="echo 'Hiiii' > ExampleFile && grep 'Hiiii' ExampleFile && rm ExampleFile"
+        ;;
+
+        "touch") Example="touch newfile && ls && rm newfile && ls"
+        ;;
+
+        "whoami") Example="whoami"
+        ;;
+
+        "cat") Example="echo 'Hala Mohammed - 1210312' > File && cat File && rm File"
+        ;;
+
+        *) Example="$command"
+        ;;
+    esac
+    # Execute the examples of the  commands
+    ExecuteExample=$($Example)
+
+    # Find the version of the command using uname -r
+    Version=$(uname -r)
+
+    # Find related commands
+    RelatedCommands=$(compgen -c | grep "$command")
+
+    # Create a text file for the command and write the info of the command
+    cat > "CommandManuals/${command}.txt" <<EOF
+>${command}
+----------------------------------------------------------------
+Description:
+${Description}
+----------------------------------------------------------------
+Version: 
+${Version}
+----------------------------------------------------------------
+Example:
+${Example}
+${ExecuteExample}
+----------------------------------------------------------------
+Related Commands:
+${RelatedCommands}
+----------------------------------------------------------------
+Notes: 
+----------------------------------------------------------------
+
+EOF
+
+done < "$CommandsFile"
+
+echo "All Manuals are generated!"
